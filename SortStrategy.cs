@@ -21,17 +21,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents values used by some Tidy <see cref="Document"/> properties.
 	/// </summary>
-	public enum SortStrategy
-	{
+	public enum SortStrategy {
 		/// <summary>
 		/// None.
 		/// </summary>
 		None,
+
 		/// <summary>
 		/// Alpha.
 		/// </summary>

@@ -21,13 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents the available newline types.
 	/// </summary>
-	public enum NewlineType
-	{
+	public enum NewlineType {
 		/// <summary>
 		/// LF (used by Mac OS X, Unix, Linux).
 		/// </summary>

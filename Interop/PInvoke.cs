@@ -24,10 +24,8 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TidyManaged.Interop
-{
-	internal class PInvoke
-	{
+namespace TidyManaged.Interop {
+	internal class PInvoke {
 		[DllImport("libtidy.dll")]
 		internal static extern IntPtr tidyCreate();
 
@@ -76,8 +74,7 @@ namespace TidyManaged.Interop
 		[DllImport("libtidy.dll")]
 		internal static extern int tidySaveSink(IntPtr tdoc, ref TidyOutputSink sink);
 
-		internal static string tidyOptGetValueString(IntPtr tdoc, TidyOptionId optId)
-		{
+		internal static string tidyOptGetValueString(IntPtr tdoc, TidyOptionId optId) {
 			return Marshal.PtrToStringAnsi(tidyOptGetValue(tdoc, optId));
 		}
 	}

@@ -24,21 +24,17 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TidyManaged.Interop
-{
-	internal struct TidyOutputSink
-	{
-		internal TidyOutputSink(TidyPutByteFunc putByte)
-		{
-			this.sinkData = IntPtr.Zero;
+namespace TidyManaged.Interop {
+	internal struct TidyOutputSink {
+		internal TidyOutputSink(TidyPutByteFunc putByte) {
+			sinkData = IntPtr.Zero;
 			this.putByte = putByte;
 		}
 
 #pragma warning disable 0414
-		IntPtr sinkData;
+		private IntPtr sinkData;
 
-		[MarshalAs(UnmanagedType.FunctionPtr)]
-		TidyPutByteFunc putByte;
+		[MarshalAs(UnmanagedType.FunctionPtr)] private TidyPutByteFunc putByte;
 #pragma warning restore 0414
 	}
 }

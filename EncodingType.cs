@@ -21,13 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents the supported encodings.
 	/// </summary>
-	public enum EncodingType
-	{
+	public enum EncodingType {
 		/// <summary>
 		/// No or unknown encoding.
 		/// </summary>
@@ -107,9 +105,9 @@ namespace TidyManaged
 
 #else
 
-		/// <summary>
-		/// The Big-5 or Big5 encoding scheme, used in Taiwan, Hong Kong, and Macau for Traditional Chinese characters.
-		/// </summary>
+	/// <summary>
+	/// The Big-5 or Big5 encoding scheme, used in Taiwan, Hong Kong, and Macau for Traditional Chinese characters.
+	/// </summary>
 		Big5 = 9,
 
 		/// <summary>

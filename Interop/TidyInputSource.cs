@@ -24,29 +24,23 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TidyManaged.Interop
-{
-	internal struct TidyInputSource
-	{
-		internal TidyInputSource(TidyGetByteFunc getByte, TidyUngetByteFunc ungetByte, TidyEOFFunc eof)
-		{
-			this.sourceData = IntPtr.Zero;
+namespace TidyManaged.Interop {
+	internal struct TidyInputSource {
+		internal TidyInputSource(TidyGetByteFunc getByte, TidyUngetByteFunc ungetByte, TidyEOFFunc eof) {
+			sourceData = IntPtr.Zero;
 			this.getByte = getByte;
 			this.ungetByte = ungetByte;
 			this.eof = eof;
 		}
 
 #pragma warning disable 0414
-		IntPtr sourceData;
+		private IntPtr sourceData;
 
-		[MarshalAs(UnmanagedType.FunctionPtr)]
-		TidyGetByteFunc getByte;
-		
-		[MarshalAs(UnmanagedType.FunctionPtr)]
-		TidyUngetByteFunc ungetByte;
-		
-		[MarshalAs(UnmanagedType.FunctionPtr)]
-		TidyEOFFunc eof;
+		[MarshalAs(UnmanagedType.FunctionPtr)] private TidyGetByteFunc getByte;
+
+		[MarshalAs(UnmanagedType.FunctionPtr)] private TidyUngetByteFunc ungetByte;
+
+		[MarshalAs(UnmanagedType.FunctionPtr)] private TidyEOFFunc eof;
 #pragma warning restore 0414
 	}
 }

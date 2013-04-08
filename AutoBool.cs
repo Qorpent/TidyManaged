@@ -21,21 +21,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents yes/no/auto values used by some Tidy <see cref="Document"/> properties.
 	/// </summary>
-	public enum AutoBool
-	{
+	public enum AutoBool {
 		/// <summary>
 		/// No.
 		/// </summary>
 		No,
+
 		/// <summary>
 		/// Yes.
 		/// </summary>
 		Yes,
+
 		/// <summary>
 		/// Automatic.
 		/// </summary>

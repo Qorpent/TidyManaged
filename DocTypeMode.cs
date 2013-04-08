@@ -21,13 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents the available accessibility DOCTYPE modes.
 	/// </summary>
-	public enum DocTypeMode
-	{
+	public enum DocTypeMode {
 		/// <summary>
 		/// Omit DOCTYPE altogether.
 		/// </summary>

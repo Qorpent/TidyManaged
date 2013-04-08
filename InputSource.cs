@@ -23,33 +23,30 @@
 
 using System;
 using System.IO;
+using TidyManaged.Interop;
 
-namespace TidyManaged
-{
-	internal class InputSource
-	{
-		internal InputSource(Stream stream)
-		{
+namespace TidyManaged {
+	internal class InputSource {
+		internal InputSource(Stream stream) {
 			this.stream = stream;
-			this.TidyInputSource = new Interop.TidyInputSource(new Interop.TidyGetByteFunc(OnGetByte), new Interop.TidyUngetByteFunc(OnUngetByte), new Interop.TidyEOFFunc(OnEOF));
+			TidyInputSource = new TidyInputSource(OnGetByte, OnUngetByte, OnEOF);
 		}
 
-		Stream stream;
-		internal Interop.TidyInputSource TidyInputSource;
+		private readonly Stream stream;
+		internal TidyInputSource TidyInputSource;
 
-		byte OnGetByte(IntPtr sinkData)
-		{
-			return (byte) this.stream.ReadByte();
+		private byte OnGetByte(IntPtr sinkData) {
+			return (byte) stream.ReadByte();
 		}
 
-		void OnUngetByte(IntPtr sinkData, byte bt)
-		{
-			if (this.stream.Position > 0) this.stream.Position--;
+		private void OnUngetByte(IntPtr sinkData, byte bt) {
+			if (stream.Position > 0) {
+				stream.Position--;
+			}
 		}
 
-		bool OnEOF(IntPtr sinkData)
-		{
-			return (this.stream.Position >= this.stream.Length);
+		private bool OnEOF(IntPtr sinkData) {
+			return (stream.Position >= stream.Length);
 		}
 	}
 }

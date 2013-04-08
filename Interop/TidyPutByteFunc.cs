@@ -23,7 +23,6 @@
 
 using System;
 
-namespace TidyManaged.Interop
-{
+namespace TidyManaged.Interop {
 	internal delegate void TidyPutByteFunc(IntPtr sinkData, byte bt);
 }

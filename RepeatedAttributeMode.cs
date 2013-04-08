@@ -21,13 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-namespace TidyManaged
-{
+namespace TidyManaged {
 	/// <summary>
 	/// Represents the available repeated-attribute handling modes.
 	/// </summary>
-	public enum RepeatedAttributeMode
-	{
+	public enum RepeatedAttributeMode {
 		/// <summary>
 		/// Keep the first attribute.
 		/// </summary>

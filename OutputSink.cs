@@ -23,23 +23,20 @@
 
 using System;
 using System.IO;
+using TidyManaged.Interop;
 
-namespace TidyManaged
-{
-	internal class OutputSink
-	{
-		internal OutputSink(Stream stream)
-		{
+namespace TidyManaged {
+	internal class OutputSink {
+		internal OutputSink(Stream stream) {
 			this.stream = stream;
-			this.TidyOutputSink = new Interop.TidyOutputSink(new Interop.TidyPutByteFunc(OnPutByte));
+			TidyOutputSink = new TidyOutputSink(OnPutByte);
 		}
 
-		Stream stream;
-		internal Interop.TidyOutputSink TidyOutputSink;
+		private readonly Stream stream;
+		internal TidyOutputSink TidyOutputSink;
 
-		void OnPutByte(IntPtr sinkData, byte bt)
-		{
-			this.stream.WriteByte(bt);
+		private void OnPutByte(IntPtr sinkData, byte bt) {
+			stream.WriteByte(bt);
 		}
 	}
 }
