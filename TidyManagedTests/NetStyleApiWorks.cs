@@ -9,12 +9,12 @@ namespace TidyManagedTests {
 	public class NetStyleApiWorks {
 		[Test]
 		public void CreateAndRelaseDocumentTest() {
-			var dochandle = TidyLibrary.Document.Create();
+			var dochandle = TidyLibrary.Create();
 			try {
 				Assert.AreNotEqual(IntPtr.Zero,dochandle);
 			}
 			finally {
-				TidyLibrary.Document.Release(dochandle);
+				TidyLibrary.Release(dochandle);
 			}
 		}
 
@@ -27,22 +27,22 @@ namespace TidyManagedTests {
 
 		[Test]
 		public void SetAndGetOptionsInGenericMode() {
-			var dochandle = TidyLibrary.Document.Create();
+			var dochandle = TidyLibrary.Create();
 			try
 			{
-				TidyLibrary.Document.SetOption(dochandle,TidyOptionId.TidyAltText, "text");
-				Assert.AreEqual("text",TidyLibrary.Document.GetOption<string>(dochandle,TidyOptionId.TidyAltText),"string");
-				TidyLibrary.Document.SetOption(dochandle, TidyOptionId.TidyBodyOnly, true);
-				Assert.AreEqual(true, TidyLibrary.Document.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool true");
-				TidyLibrary.Document.SetOption(dochandle, TidyOptionId.TidyBodyOnly, false);
-				Assert.AreEqual(false, TidyLibrary.Document.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool false");
-				Assert.AreEqual(TidyLibrary.Constants.DEFAULT_INDENT_SPACES, TidyLibrary.Document.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");
-				TidyLibrary.Document.SetOption(dochandle, TidyOptionId.TidyIndentSpaces, 16);
-				Assert.AreEqual(16, TidyLibrary.Document.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");
+				TidyLibrary.SetOption(dochandle,TidyOptionId.TidyAltText, "text");
+				Assert.AreEqual("text",TidyLibrary.GetOption<string>(dochandle,TidyOptionId.TidyAltText),"string");
+				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, true);
+				Assert.AreEqual(true, TidyLibrary.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool true");
+				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, false);
+				Assert.AreEqual(false, TidyLibrary.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool false");
+				Assert.AreEqual(TidyLibrary.Constants.DEFAULT_INDENT_SPACES, TidyLibrary.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");
+				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyIndentSpaces, 16);
+				Assert.AreEqual(16, TidyLibrary.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");
 			}
 			finally
 			{
-				TidyLibrary.Document.Release(dochandle);
+				TidyLibrary.Release(dochandle);
 			}
 		}
 

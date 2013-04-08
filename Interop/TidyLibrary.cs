@@ -110,24 +110,6 @@ namespace TidyManaged.Interop {
 			public static extern bool tidyOptSetBool(IntPtr tdoc, TidyOptionId optId, bool val);
 
 			/// <summary>
-			///Parse markup in named file
-			/// </summary>
-			/// <param name="tdoc"></param>
-			/// <param name="filename"></param>
-			/// <returns></returns>
-			[DllImport("libtidy.dll")]
-			public static extern int tidyParseFile(IntPtr tdoc, string filename);
-
-			/// <summary>
-			/// Parse markup in given string
-			/// </summary>
-			/// <param name="tdoc"></param>
-			/// <param name="content"></param>
-			/// <returns></returns>
-			[DllImport("libtidy.dll")]
-			public static extern int tidyParseString(IntPtr tdoc, string content);
-
-			/// <summary>
 			/// Parse markup in given generic input source
 			/// </summary>
 			/// <param name="tdoc"></param>
@@ -171,10 +153,6 @@ namespace TidyManaged.Interop {
 			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidySaveSink(IntPtr tdoc, ref TidyOutputSink sink);
-
-			public static string tidyOptGetValueString(IntPtr tdoc, TidyOptionId optId) {
-				return Marshal.PtrToStringAnsi(tidyOptGetValue(tdoc, optId));
-			}
 		}
 	}
 }

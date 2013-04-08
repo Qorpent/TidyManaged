@@ -51,7 +51,9 @@ namespace TidyManagedTests {
 			d.CleanAndRepair();
 			var result = d.Save();
 			Console.WriteLine(result);
-			Assert.AreEqual("ПРИВЕТ",result);
+			Assert.AreEqual("ПРИВЕТ\r\n",result);
 		}
 	}
+
+	
 }
