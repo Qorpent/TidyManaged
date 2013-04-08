@@ -25,8 +25,10 @@
 
 #endregion
 
+using System;
 using System.IO;
 using NUnit.Framework;
+using TidyManaged;
 
 namespace TidyManagedTests {
 	[TestFixture(Description = "tests that environment is well formed")]
@@ -39,6 +41,16 @@ namespace TidyManagedTests {
 		public void LibTidyAccessibleWithPinvoke()
 		{
 			Assert.AreNotEqual(0, TidyManaged.Interop.TidyLibrary.Native.tidyReleaseDate());
+		}
+
+		[Test]
+		public void CanParseUtf8() {
+			var d = Document.FromString("ПРИВЕТ");
+			d.OutputBodyOnly = AutoBool.Yes;
+			d.CleanAndRepair();
+			var result = d.Save();
+			Console.WriteLine(result);
+			Assert.AreEqual("ПРИВЕТ",result);
 		}
 	}
 }

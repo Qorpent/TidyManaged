@@ -854,12 +854,15 @@ namespace TidyManaged {
 			if (fromString) {
 				EncodingType tempEnc = InputCharacterEncoding;
 				InputCharacterEncoding = EncodingType.Utf8;
-				TidyLibrary.Native.tidyParseString(handle, htmlString);
+				var instream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
+				InputSource input = new InputSource(instream);
+				TidyLibrary.Native.tidyParseSource(handle, ref input.TidyInputSource);
 				InputCharacterEncoding = tempEnc;
 			}
 			else {
 				InputSource input = new InputSource(stream);
 				TidyLibrary.Native.tidyParseSource(handle, ref input.TidyInputSource);
+				stream.Close();
 			}
 			TidyLibrary.Native.tidyCleanAndRepair(handle);
 			cleaned = true;
