@@ -24,7 +24,7 @@
 using System;
 
 namespace TidyManaged.Interop {
-	internal enum TidyOptionId {
+	public enum TidyOptionId {
 		TidyUnknownOption, /*< Unknown option! */
 		TidyIndentSpaces, /*< Indentation n spaces */
 		TidyWrapLen, /*< Wrap margin */

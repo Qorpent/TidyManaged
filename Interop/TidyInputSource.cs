@@ -25,7 +25,7 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace TidyManaged.Interop {
-	internal struct TidyInputSource {
+	public struct TidyInputSource {
 		internal TidyInputSource(TidyGetByteFunc getByte, TidyUngetByteFunc ungetByte, TidyEOFFunc eof) {
 			sourceData = IntPtr.Zero;
 			this.getByte = getByte;

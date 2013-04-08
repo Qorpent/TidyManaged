@@ -1,5 +1,7 @@
-// Copyright (c) 2009 Mark Beaton
-//
+﻿#region LICENSE
+
+// Copyright (c) 2013 Comdiv (Qorpent Team) Fagim Sadykov
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -8,10 +10,10 @@
 // copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 // OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,20 +23,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Runtime.InteropServices;
+#endregion
 
-namespace TidyManaged.Interop {
-	public struct TidyOutputSink {
-		internal TidyOutputSink(TidyPutByteFunc putByte) {
-			sinkData = IntPtr.Zero;
-			this.putByte = putByte;
+using System.IO;
+using NUnit.Framework;
+
+namespace TidyManagedTests {
+	[TestFixture(Description = "tests that environment is well formed")]
+	public class TestEnvironmentIntegrityTests {
+		[Test(Description = "tests that libtidy.dll is on direct file path")]
+		public void LibTidyIsPlacedLocallyToTestProcess() {
+			Assert.True(File.Exists("libtidy.dll"));
 		}
-
-#pragma warning disable 0414
-		private IntPtr sinkData;
-
-		[MarshalAs(UnmanagedType.FunctionPtr)] private TidyPutByteFunc putByte;
-#pragma warning restore 0414
+		[Test(Description = "interop working test")]
+		public void LibTidyAccessibleWithPinvoke()
+		{
+			Assert.AreNotEqual(0, TidyManaged.Interop.TidyLibrary.Native.tidyReleaseDate());
+		}
 	}
 }

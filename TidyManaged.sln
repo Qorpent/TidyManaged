@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "win64", "win64", "{EAB13004
 		dependency\win64\libtidy.dll = dependency\win64\libtidy.dll
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TidyManagedTests", "TidyManagedTests\TidyManagedTests.csproj", "{C8915BD1-A8D9-4AA9-BEB7-1994F4FE0769}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{D799633D-00EF-437C-B158-315557D930FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D799633D-00EF-437C-B158-315557D930FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D799633D-00EF-437C-B158-315557D930FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8915BD1-A8D9-4AA9-BEB7-1994F4FE0769}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8915BD1-A8D9-4AA9-BEB7-1994F4FE0769}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8915BD1-A8D9-4AA9-BEB7-1994F4FE0769}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8915BD1-A8D9-4AA9-BEB7-1994F4FE0769}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
