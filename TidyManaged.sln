@@ -10,6 +10,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFiles", "ProjectFile
 		tidy-open.snk = tidy-open.snk
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependency", "Dependency", "{3E01196B-C7A3-4757-8DBB-76FAF06A6A37}"
+	ProjectSection(SolutionItems) = preProject
+		dependency\nunit.framework.dll = dependency\nunit.framework.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "win64", "win64", "{EAB13004-3F4F-48DF-A9CD-329290045B9F}"
+	ProjectSection(SolutionItems) = preProject
+		dependency\win64\libtidy.dll = dependency\win64\libtidy.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +33,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EAB13004-3F4F-48DF-A9CD-329290045B9F} = {3E01196B-C7A3-4757-8DBB-76FAF06A6A37}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = TidyManaged.csproj
