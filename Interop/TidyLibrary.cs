@@ -25,53 +25,150 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace TidyManaged.Interop {
-	public static class TidyLibrary {
+	/// <summary>
+	/// Represents direct low-level tidy API
+	/// </summary>
+	public  static partial class TidyLibrary {
+		/// <summary>
+		/// Shallow tidy functions representation
+		/// </summary>
 		public static class Native {
+			/// <summary>
+			/// Initializes tidy document
+			/// </summary>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern IntPtr tidyCreate();
 
+			/// <summary>
+			/// Releases tidy document
+			/// </summary>
+			/// <param name="tdoc"></param>
 			[DllImport("libtidy.dll")]
 			public static extern void tidyRelease(IntPtr tdoc);
 
+			/// <summary>
+			/// Returns tidy library release date
+			/// </summary>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern IntPtr tidyReleaseDate();
 
+			/// <summary>
+			/// Get current Option value as a string
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern IntPtr tidyOptGetValue(IntPtr tdoc, TidyOptionId optId);
 
+			/// <summary>
+			/// Set Option value as a string
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <param name="val"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern bool tidyOptSetValue(IntPtr tdoc, TidyOptionId optId, string val);
-
+			/// <summary>
+			/// Get current Option value as int
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern uint tidyOptGetInt(IntPtr tdoc, TidyOptionId optId);
-
+			/// <summary>
+			/// Set option value as int
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <param name="val"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern bool tidyOptSetInt(IntPtr tdoc, TidyOptionId optId, uint val);
 
+			/// <summary>
+			/// Get option value as bool
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern bool tidyOptGetBool(IntPtr tdoc, TidyOptionId optId);
 
+			/// <summary>
+			/// Set option value as bool
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="optId"></param>
+			/// <param name="val"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern bool tidyOptSetBool(IntPtr tdoc, TidyOptionId optId, bool val);
 
+			/// <summary>
+			///Parse markup in named file
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="filename"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidyParseFile(IntPtr tdoc, string filename);
 
+			/// <summary>
+			/// Parse markup in given string
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="content"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidyParseString(IntPtr tdoc, string content);
 
+			/// <summary>
+			/// Parse markup in given generic input source
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="source"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidyParseSource(IntPtr tdoc, ref TidyInputSource source);
 
+			/// <summary>
+			/// Execute configured cleanup and repair operations on parsed markup
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidyCleanAndRepair(IntPtr tdoc);
 
+			/// <summary>
+			/// Saves result to file
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="filname"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidySaveFile(IntPtr tdoc, string filname);
 
+			/// <summary>
+			/// Saves result to string buffer
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="buffer"></param>
+			/// <param name="buflen"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidySaveString(IntPtr tdoc, IntPtr buffer, ref uint buflen);
 
+			/// <summary>
+			/// Save to given generic output sink
+			/// </summary>
+			/// <param name="tdoc"></param>
+			/// <param name="sink"></param>
+			/// <returns></returns>
 			[DllImport("libtidy.dll")]
 			public static extern int tidySaveSink(IntPtr tdoc, ref TidyOutputSink sink);
 

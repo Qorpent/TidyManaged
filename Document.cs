@@ -37,7 +37,7 @@ namespace TidyManaged {
 		#region Constructors
 
 		private Document() {
-			handle = TidyLibrary.Native.tidyCreate();
+			handle = TidyLibrary.Document.Create();
 			disposed = false;
 		}
 
@@ -75,22 +75,13 @@ namespace TidyManaged {
 		/// Gets the release date of the underlying Tidy library.
 		/// </summary>
 		public DateTime ReleaseDate {
-			get {
-				lock (releaseDateLock) {
-					if (!_ReleaseDate.HasValue) {
-						DateTime val = DateTime.MinValue;
-						string release = Marshal.PtrToStringAnsi(TidyLibrary.Native.tidyReleaseDate());
-						if (release != null) {
-							var tokens = release.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-							if (tokens.Length >= 3) {
-								DateTime.TryParseExact(tokens[0] + " " + tokens[1] + " " + tokens[2], "d MMMM yyyy",
-								                       CultureInfo.InvariantCulture, DateTimeStyles.None, out val);
-							}
-						}
-						_ReleaseDate = val;
+			get {			
+				if (!_ReleaseDate.HasValue) {
+					lock (releaseDateLock) {
+						_ReleaseDate = TidyLibrary.GetReleaseDate();
 					}
-					return _ReleaseDate.Value;
 				}
+				return _ReleaseDate.Value;
 			}
 		}
 
@@ -100,24 +91,24 @@ namespace TidyManaged {
 		/// [add-xml-decl] Gets or sets whether Tidy should add the XML declaration when outputting XML or XHTML. Note that if the input already includes an &lt;?xml ... ?&gt; declaration then this option will be ignored. If the encoding for the output is different from "ascii", one of the utf encodings or "raw", the declaration is always added as required by the XML standard. Defaults to false.
 		/// </summary>
 		public bool AddXmlDeclaration {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXmlDecl); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXmlDecl, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXmlDecl); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXmlDecl, value); }
 		}
 
 		/// <summary>
 		/// [add-xml-space] Gets or sets whether Tidy should add xml:space="preserve" to elements such as &lt;PRE&gt;, &lt;STYLE&gt; and &lt;SCRIPT&gt; when generating XML. This is needed if the whitespace in such elements is to be parsed appropriately without having access to the DTD. Defaults to false.
 		/// </summary>
 		public bool AddXmlSpacePreserve {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXmlSpace); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXmlSpace, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXmlSpace); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXmlSpace, value); }
 		}
 
 		/// <summary>
 		/// [alt-text] Gets or sets the default "alt=" text Tidy uses for &lt;IMG&gt; attributes. This feature is dangerous as it suppresses further accessibility warnings. You are responsible for making your documents accessible to people who can not see the images!
 		/// </summary>
 		public string DefaultAltText {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyAltText); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyAltText, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyAltText); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyAltText, value); }
 		}
 
 		/// <summary>
@@ -130,14 +121,14 @@ namespace TidyManaged {
 					Trace.WriteLine("AnchorAsName is not supported by your version of tidylib - ignoring.");
 					return true;
 				}
-				return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyAnchorAsName);
+				return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyAnchorAsName);
 			}
 			set {
 				if (ReleaseDate < new DateTime(2008, 6, 18)) {
 					Trace.WriteLine("AnchorAsName is not supported by your version of tidylib - ignoring.");
 				}
 				else {
-					TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyAnchorAsName, value);
+					TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyAnchorAsName, value);
 				}
 			}
 		}
@@ -146,40 +137,40 @@ namespace TidyManaged {
 		/// [assume-xml-procins] Gets or sets whether Tidy should change the parsing of processing instructions to require ?&gt; as the terminator rather than &gt;. This option is automatically set if the input is in XML. Defaults to false.
 		/// </summary>
 		public bool ChangeXmlProcessingInstructions {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXmlPIs); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXmlPIs, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXmlPIs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXmlPIs, value); }
 		}
 
 		/// <summary>
 		/// [bare] Gets or sets whether Tidy should strip Microsoft specific HTML from Word 2000 documents, and output spaces rather than non-breaking spaces where they exist in the input. Defaults to false.
 		/// </summary>
 		public bool MakeBare {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyMakeBare); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyMakeBare, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyMakeBare); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyMakeBare, value); }
 		}
 
 		/// <summary>
 		/// [clean] Gets or sets whether Tidy should strip out surplus presentational tags and attributes replacing them by style rules and structural markup as appropriate. It works well on the HTML saved by Microsoft Office products. Defaults to false.
 		/// </summary>
 		public bool MakeClean {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyMakeClean); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyMakeClean, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyMakeClean); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyMakeClean, value); }
 		}
 
 		/// <summary>
 		/// [css-prefix] Gets or sets the prefix that Tidy uses for styles rules. By default, "c" will be used.
 		/// </summary>
 		public string CssPrefix {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyCSSPrefix); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyCSSPrefix, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyCSSPrefix); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyCSSPrefix, value); }
 		}
 
 		/// <summary>
 		/// [decorate-inferred-ul] Gets or sets whether Tidy should decorate inferred UL elements with some CSS markup to avoid indentation to the right. Defaults to false.
 		/// </summary>
 		public bool DecorateInferredUL {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyDecorateInferredUL); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyDecorateInferredUL, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyDecorateInferredUL); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDecorateInferredUL, value); }
 		}
 
 		/// <summary>
@@ -191,160 +182,160 @@ namespace TidyManaged {
 		/// If you specify the FPI for an XHTML document, Tidy will set the system identifier to an empty string. For an HTML document, Tidy adds a system identifier only if one was already present in order to preserve the processing mode of some browsers. Tidy leaves the DOCTYPE for generic XML documents unchanged. "Omit" implies OutputNumericEntities = true. This option does not offer a validation of the document conformance. 
 		/// </summary>
 		public DocTypeMode DocType {
-			get { return (DocTypeMode) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyDoctypeMode); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyDoctypeMode, (uint) value); }
+			get { return (DocTypeMode) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyDoctypeMode); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDoctypeMode, (uint) value); }
 		}
 
 		/// <summary>
 		/// [drop-empty-paras] Gets or sets whether Tidy should discard empty paragraphs. Defaults to true.
 		/// </summary>
 		public bool DropEmptyParagraphs {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyDropEmptyParas); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyDropEmptyParas, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyDropEmptyParas); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDropEmptyParas, value); }
 		}
 
 		/// <summary>
 		/// [drop-font-tags] Gets or sets whether Tidy should discard &lt;FONT&gt; and &lt;CENTER&gt; tags without creating the corresponding style rules. This option can be set independently of the MakeClean option. Defaults to false.
 		/// </summary>
 		public bool DropFontTags {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyDropFontTags); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyDropFontTags, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyDropFontTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDropFontTags, value); }
 		}
 
 		/// <summary>
 		/// [drop-proprietary-attributes] Gets or sets whether Tidy should strip out proprietary attributes, such as MS data binding attributes. Defaults to false.
 		/// </summary>
 		public bool DropProprietaryAttributes {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyDropPropAttrs); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyDropPropAttrs, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyDropPropAttrs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDropPropAttrs, value); }
 		}
 
 		/// <summary>
 		/// [enclose-block-text] Gets or sets whether Tidy should insert a &lt;P&gt; element to enclose any text it finds in any element that allows mixed content for HTML transitional but not HTML strict. Defaults to false.
 		/// </summary>
 		public bool EncloseBlockText {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyEncloseBlockText); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyEncloseBlockText, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyEncloseBlockText); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyEncloseBlockText, value); }
 		}
 
 		/// <summary>
 		/// [enclose-text] Gets or sets whether Tidy should enclose any text it finds in the body element within a &lt;P&gt; element. This is useful when you want to take existing HTML and use it with a style sheet. Defaults to false.
 		/// </summary>
 		public bool EncloseBodyText {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyEncloseBodyText); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyEncloseBodyText, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyEncloseBodyText); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyEncloseBodyText, value); }
 		}
 
 		/// <summary>
 		/// [escape-cdata] Gets or sets whether Tidy should convert &lt;![CDATA[]]&gt; sections to normal text. Defaults to false.
 		/// </summary>
 		public bool EscapeCdata {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyEscapeCdata); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyEscapeCdata, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyEscapeCdata); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyEscapeCdata, value); }
 		}
 
 		/// <summary>
 		/// [fix-backslash] Gets or sets whether Tidy should replace backslash characters "\" in URLs with forward slashes "/". Defaults to true.
 		/// </summary>
 		public bool FixUrlBackslashes {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyFixBackslash); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyFixBackslash, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyFixBackslash); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyFixBackslash, value); }
 		}
 
 		/// <summary>
 		/// [fix-bad-comments] Gets or sets whether Tidy should replace unexpected hyphens with "=" characters when it comes across adjacent hyphens. This option is provided for users of Cold Fusion which uses the comment syntax: &lt;!--- ---&gt;. Defaults to true.
 		/// </summary>
 		public bool FixBadComments {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyFixComments); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyFixComments, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyFixComments); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyFixComments, value); }
 		}
 
 		/// <summary>
 		/// [fix-uri] Gets or sets whether Tidy should check attribute values that carry URIs for illegal characters and if such are found, escape them as HTML 4 recommends. Defaults to true.
 		/// </summary>
 		public bool FixAttributeUris {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyFixUri); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyFixUri, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyFixUri); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyFixUri, value); }
 		}
 
 		/// <summary>
 		/// [hide-comments] Gets or sets whether Tidy should print out comments. Defaults to false.
 		/// </summary>
 		public bool RemoveComments {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyHideComments); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyHideComments, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyHideComments); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyHideComments, value); }
 		}
 
 		/// <summary>
 		/// [hide-endtags] Gets or sets whether Tidy should omit optional end-tags when generating the pretty printed markup. This option is ignored if you are outputting to XML. Defaults to false.
 		/// </summary>
 		public bool RemoveEndTags {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyHideEndTags); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyHideEndTags, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyHideEndTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyHideEndTags, value); }
 		}
 
 		/// <summary>
 		/// [indent-cdata] Gets or sets whether Tidy should indent &lt;![CDATA[]]&gt; sections. Defaults to false.
 		/// </summary>
 		public bool IndentCdata {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyIndentCdata); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyIndentCdata, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyIndentCdata); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyIndentCdata, value); }
 		}
 
 		/// <summary>
 		/// [input-xml] Gets or sets whether Tidy use the XML parser rather than the error correcting HTML parser. Defaults to false.
 		/// </summary>
 		public bool UseXmlParser {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXmlTags); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXmlTags, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXmlTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXmlTags, value); }
 		}
 
 		/// <summary>
 		/// [join-classes] Gets or sets whether Tidy should combine class names to generate a single new class name, if multiple class assignments are detected on an element. Defaults to false.
 		/// </summary>
 		public bool JoinClasses {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyJoinClasses); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyJoinClasses, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyJoinClasses); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyJoinClasses, value); }
 		}
 
 		/// <summary>
 		/// [join-styles] Gets or sets whether Tidy should combine styles to generate a single new style, if multiple style values are detected on an element. Defaults to true.
 		/// </summary>
 		public bool JoinStyles {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyJoinStyles); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyJoinStyles, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyJoinStyles); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyJoinStyles, value); }
 		}
 
 		/// <summary>
 		/// [literal-attributes] Gets or sets whether Tidy should ensure that whitespace characters within attribute values are passed through unchanged. Defaults to false.
 		/// </summary>
 		public bool EnsureLiteralAttributes {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyLiteralAttribs); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyLiteralAttribs, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyLiteralAttribs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyLiteralAttribs, value); }
 		}
 
 		/// <summary>
 		/// [logical-emphasis] Gets or sets whether Tidy should replace any occurrence of &lt;I&gt; by &lt;EM&gt; and any occurrence of &lt;B&gt; by &lt;STRONG&gt;. In both cases, the attributes are preserved unchanged. This option can be set independently of the "MakeClean" and "DropFontTags" properties. Defaults to false.
 		/// </summary>
 		public bool UseLogicalEmphasis {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyLogicalEmphasis); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyLogicalEmphasis, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyLogicalEmphasis); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyLogicalEmphasis, value); }
 		}
 
 		/// <summary>
 		/// [lower-literals] Gets or sets whether Tidy should convert the value of an attribute that takes a list of predefined values to lower case. This is required for XHTML documents. Defaults to false.
 		/// </summary>
 		public bool LowerCaseLiterals {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyLowerLiterals); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyLowerLiterals, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyLowerLiterals); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyLowerLiterals, value); }
 		}
 
 		/// <summary>
 		/// [merge-divs] Gets or sets whether Tidy should merge nested &lt;div&gt; such as "&lt;div&gt;&lt;divglt;...&lt;/div&gt;&lt;/div&gt;". If set to "Auto", the attributes of the inner &lt;div&gt; are moved to the outer one. As well, nested &lt;div&gt; with ID attributes are not merged. If set to "Yes", the attributes of the inner &lt;div&gt; are discarded with the exception of "class" and "style". Can be used to modify behavior of the "MakeClean" option. Defaults to Auto.
 		/// </summary>
 		public AutoBool MergeDivs {
-			get { return (AutoBool) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyMergeDivs); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyMergeDivs, (uint) value); }
+			get { return (AutoBool) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyMergeDivs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyMergeDivs, (uint) value); }
 		}
 
 		/// <summary>
@@ -357,14 +348,14 @@ namespace TidyManaged {
 					Trace.WriteLine("MergeSpans is not supported by your version of tidylib - ignoring.");
 					return AutoBool.No;
 				}
-				return (AutoBool) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyMergeSpans);
+				return (AutoBool) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyMergeSpans);
 			}
 			set {
 				if (ReleaseDate < new DateTime(2007, 8, 13)) {
 					Trace.WriteLine("MergeSpans is not supported by your version of tidylib - ignoring.");
 				}
 				else {
-					TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyMergeSpans, (uint) value);
+					TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyMergeSpans, (uint) value);
 				}
 			}
 		}
@@ -374,8 +365,8 @@ namespace TidyManaged {
 		/// [ncr] Gets or sets whether Tidy should allow numeric character references. Defaults to true.
 		/// </summary>
 		public bool AllowNumericCharacterReferences {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyNCR); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyNCR, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyNCR); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyNCR, value); }
 		}
 #endif
 
@@ -383,112 +374,112 @@ namespace TidyManaged {
 		/// [new-blocklevel-tags] Gets or sets new block-level tags. This option takes a space or comma separated list of tag names. Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. Note you can't change the content model for elements such as &lt;TABLE&gt;, &lt;UL&gt;, &lt;OL&gt; and &lt;DL&gt;. This option is ignored in XML mode.
 		/// </summary>
 		public string NewBlockLevelTags {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyBlockTags); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyBlockTags, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyBlockTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyBlockTags, value); }
 		}
 
 		/// <summary>
 		/// [new-empty-tags] Gets or sets new empty inline tags. This option takes a space or comma separated list of tag names. Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. This option is ignored in XML mode.
 		/// </summary>
 		public string NewEmptyInlineTags {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyEmptyTags); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyEmptyTags, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyEmptyTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyEmptyTags, value); }
 		}
 
 		/// <summary>
 		/// [new-inline-tags] Gets or sets new non-empty inline tags. This option takes a space or comma separated list of tag names. Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. This option is ignored in XML mode.
 		/// </summary>
 		public string NewInlineTags {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyInlineTags); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyInlineTags, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyInlineTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyInlineTags, value); }
 		}
 
 		/// <summary>
 		/// [new-pre-tags] Gets or sets new tags that are to be processed in exactly the same way as HTML's &lt;PRE&gt; element. This option takes a space or comma separated list of tag names. Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. Note you can not as yet add new CDATA elements (similar to &lt;SCRIPT&gt;). This option is ignored in XML mode.
 		/// </summary>
 		public string NewPreTags {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyPreTags); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyPreTags, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyPreTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyPreTags, value); }
 		}
 
 		/// <summary>
 		/// [numeric-entities] Gets or sets whether Tidy should output entities other than the built-in HTML entities (&amp;amp;, &amp;lt;, &amp;gt; and &amp;quot;) in the numeric rather than the named entity form. Only entities compatible with the DOCTYPE declaration generated are used. Entities that can be represented in the output encoding are translated correspondingly. Defaults to false.
 		/// </summary>
 		public bool OutputNumericEntities {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyNumEntities); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyNumEntities, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyNumEntities); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyNumEntities, value); }
 		}
 
 		/// <summary>
 		/// [output-html] Gets or sets whether Tidy should generate pretty printed output, writing it as HTML. Defaults to false.
 		/// </summary>
 		public bool OutputHtml {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyHtmlOut); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyHtmlOut, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyHtmlOut); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyHtmlOut, value); }
 		}
 
 		/// <summary>
 		/// [output-xhtml] Gets or sets whether Tidy should generate pretty printed output, writing it as extensible HTML. This option causes Tidy to set the DOCTYPE and default namespace as appropriate to XHTML. If a DOCTYPE or namespace is given they will checked for consistency with the content of the document. In the case of an inconsistency, the corrected values will appear in the output. For XHTML, entities can be written as named or numeric entities according to the setting of the "OutputNumericEntities" value. The original case of tags and attributes will be preserved, regardless of other options. Defaults to false.
 		/// </summary>
 		public bool OutputXhtml {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXhtmlOut); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXhtmlOut, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXhtmlOut); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXhtmlOut, value); }
 		}
 
 		/// <summary>
 		/// [output-xml] Gets or sets whether Tidy should generate pretty printed output, writing it as well-formed XML. Any entities not defined in XML 1.0 will be written as numeric entities to allow them to be parsed by a XML parser. The original case of tags and attributes will be preserved, regardless of other options. Defaults to false.
 		/// </summary>
 		public bool OutputXml {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyXmlOut); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyXmlOut, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyXmlOut); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyXmlOut, value); }
 		}
 
 		/// <summary>
 		/// [preserve-entities] Gets or sets whether Tidy should preserve the well-formed entitites as found in the input. Defaults to false.
 		/// </summary>
 		public bool PreserveEntities {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyPreserveEntities); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyPreserveEntities, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyPreserveEntities); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyPreserveEntities, value); }
 		}
 
 		/// <summary>
 		/// [quote-ampersand] Gets or sets whether Tidy should output unadorned &amp; characters as &amp;amp;. Defaults to true.
 		/// </summary>
 		public bool QuoteAmpersands {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyQuoteAmpersand); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyQuoteAmpersand, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyQuoteAmpersand); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyQuoteAmpersand, value); }
 		}
 
 		/// <summary>
 		/// [quote-marks] Gets or sets whether Tidy should output " characters as &amp;quot; as is preferred by some editing environments. The apostrophe character ' is written out as &amp;#39; since many web browsers don't yet support &amp;apos;. Defaults to false.
 		/// </summary>
 		public bool QuoteMarks {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyQuoteMarks); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyQuoteMarks, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyQuoteMarks); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyQuoteMarks, value); }
 		}
 
 		/// <summary>
 		/// [quote-nbsp] Gets or sets whether Tidy should output non-breaking space characters as entities, rather than as the Unicode character value 160 (decimal). Defaults to true.
 		/// </summary>
 		public bool QuoteNonBreakingSpaces {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyQuoteNbsp); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyQuoteNbsp, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyQuoteNbsp); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyQuoteNbsp, value); }
 		}
 
 		/// <summary>
 		/// [repeated-attributes] Gets or sets whether Tidy should keep the first or last attribute, if an attribute is repeated, e.g. has two align attributes. Defaults to "KeepLast".
 		/// </summary>
 		public RepeatedAttributeMode RepeatedAttributeMode {
-			get { return (RepeatedAttributeMode) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyDuplicateAttrs); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyDuplicateAttrs, (uint) value); }
+			get { return (RepeatedAttributeMode) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyDuplicateAttrs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyDuplicateAttrs, (uint) value); }
 		}
 
 		/// <summary>
 		/// [replace-color] Gets or sets whether Tidy should replace numeric values in color attributes by HTML/XHTML color names where defined, e.g. replace "#ffffff" with "white". Defaults to false.
 		/// </summary>
 		public bool UseColorNames {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyReplaceColor); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyReplaceColor, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyReplaceColor); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyReplaceColor, value); }
 		}
 
 		/// <summary>
@@ -498,18 +489,18 @@ namespace TidyManaged {
 			// This option was changed from a Bool to an AutoBool on 24 May 2007.
 			get {
 				if (ReleaseDate < new DateTime(2007, 5, 24)) {
-					return (TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyBodyOnly) ? AutoBool.Yes : AutoBool.No);
+					return (TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyBodyOnly) ? AutoBool.Yes : AutoBool.No);
 				}
 				else {
-					return (AutoBool) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyBodyOnly);
+					return (AutoBool) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyBodyOnly);
 				}
 			}
 			set {
 				if (ReleaseDate < new DateTime(2007, 5, 24)) {
-					TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyBodyOnly, (value == AutoBool.Yes));
+					TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyBodyOnly, (value == AutoBool.Yes));
 				}
 				else {
-					TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyBodyOnly, (uint) value);
+					TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyBodyOnly, (uint) value);
 				}
 			}
 		}
@@ -518,24 +509,24 @@ namespace TidyManaged {
 		/// [uppercase-attributes] Gets or sets whether Tidy should output attribute names in upper case. The default is false, which results in lower case attribute names, except for XML input, where the original case is preserved.
 		/// </summary>
 		public bool UpperCaseAttributes {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyUpperCaseAttrs); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyUpperCaseAttrs, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyUpperCaseAttrs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyUpperCaseAttrs, value); }
 		}
 
 		/// <summary>
 		/// [uppercase-tags] Gets or sets whether Tidy should output tag names in upper case. The default is false, which results in lower case tag names, except for XML input, where the original case is preserved.
 		/// </summary>
 		public bool UpperCaseTags {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyUpperCaseTags); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyUpperCaseTags, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyUpperCaseTags); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyUpperCaseTags, value); }
 		}
 
 		/// <summary>
 		/// [word-2000] Gets or sets whether Tidy should go to great pains to strip out all the surplus stuff Microsoft Word 2000 inserts when you save Word documents as "Web pages". Doesn't handle embedded images or VML. You should consider using Word's "Save As: Web Page, Filtered". Defaults to false.
 		/// </summary>
 		public bool CleanWord2000 {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWord2000); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWord2000, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWord2000); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWord2000, value); }
 		}
 
 		#endregion
@@ -546,20 +537,20 @@ namespace TidyManaged {
 		/// [accessibility-check] Gets or sets the level of accessibility checking, if any, that Tidy should do. Defaults to TidyClassic.
 		/// </summary>
 		public AccessibilityCheckLevel AccessibilityCheckLevel {
-			get { return (AccessibilityCheckLevel) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyAccessibilityCheckLevel); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyAccessibilityCheckLevel, (uint) value); }
+			get { return (AccessibilityCheckLevel) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyAccessibilityCheckLevel); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyAccessibilityCheckLevel, (uint) value); }
 		}
 
 		/// <summary>
 		/// [show-errors] Gets or sets the number Tidy uses to determine if further errors should be shown. If set to 0, then no errors are shown. Defaults to 6.
 		/// </summary>
 		public int MaximumErrors {
-			get { return (int) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyShowErrors); }
+			get { return (int) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyShowErrors); }
 			set {
 				if (value < 0) {
 					value = 0;
 				}
-				TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyShowErrors, (uint) value);
+				TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyShowErrors, (uint) value);
 			}
 		}
 
@@ -567,8 +558,8 @@ namespace TidyManaged {
 		/// [show-warnings] Gets or sets whether Tidy should suppress warnings. This can be useful when a few errors are hidden in a flurry of warnings. Defaults to true.
 		/// </summary>
 		public bool ShowWarnings {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyShowWarnings); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyShowWarnings, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyShowWarnings); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyShowWarnings, value); }
 		}
 
 		#endregion
@@ -579,40 +570,40 @@ namespace TidyManaged {
 		/// [break-before-br] Gets or sets whether Tidy should output a line break before each &lt;BR&gt; element. Defaults to false.
 		/// </summary>
 		public bool LineBreakBeforeBR {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyBreakBeforeBR); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyBreakBeforeBR, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyBreakBeforeBR); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyBreakBeforeBR, value); }
 		}
 
 		/// <summary>
 		/// [indent] Gets or sets whether Tidy should indent block-level tags. If set to Auto, this option causes Tidy to decide whether or not to indent the content of tags such as TITLE, H1-H6, LI, TD, TD, or P depending on whether or not the content includes a block-level element. You are advised to avoid setting indent to Yes as this can expose layout bugs in some browsers. Defaults to No.
 		/// </summary>
 		public AutoBool IndentBlockElements {
-			get { return (AutoBool) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyIndentContent); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyIndentContent, (uint) value); }
+			get { return (AutoBool) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyIndentContent); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyIndentContent, (uint) value); }
 		}
 
 		/// <summary>
 		/// [indent-attributes] Gets or sets whether Tidy should begin each attribute on a new line. Defaults to false.
 		/// </summary>
 		public bool IndentAttributes {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyIndentAttributes); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyIndentAttributes, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyIndentAttributes); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyIndentAttributes, value); }
 		}
 
 		/// <summary>
 		/// [indent-spaces] Gets or sets the number of spaces Tidy uses to indent content, when indentation is enabled. Defaults to 2.
 		/// </summary>
 		public int IndentSpaces {
-			get { return (int) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyIndentSpaces); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyIndentSpaces, (uint) value); }
+			get { return (int) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyIndentSpaces); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyIndentSpaces, (uint) value); }
 		}
 
 		/// <summary>
 		/// [markup] Gets or sets whether Tidy should generate a pretty printed version of the markup. Note that Tidy won't generate a pretty printed version if it finds significant errors (see ForceOutput). Defaults to true.
 		/// </summary>
 		public bool Markup {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyShowMarkup); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyShowMarkup, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyShowMarkup); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyShowMarkup, value); }
 		}
 
 #if SUPPORT_ASIAN_ENCODINGS
@@ -620,8 +611,8 @@ namespace TidyManaged {
 		/// [punctuation-wrap] Gets or sets whether Tidy should line wrap after some Unicode or Chinese punctuation characters. Defaults to false.
 		/// </summary>
 		public bool PunctuationWrap {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyPunctWrap); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyPunctWrap, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyPunctWrap); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyPunctWrap, value); }
 		}
 #endif
 
@@ -635,14 +626,14 @@ namespace TidyManaged {
 					Trace.WriteLine("AttributeSortType is not supported by your version of tidylib - ignoring.");
 					return SortStrategy.None;
 				}
-				return (SortStrategy) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidySortAttributes);
+				return (SortStrategy) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidySortAttributes);
 			}
 			set {
 				if (ReleaseDate < new DateTime(2007, 6, 12)) {
 					Trace.WriteLine("AttributeSortType is not supported by your version of tidylib - ignoring.");
 				}
 				else {
-					TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidySortAttributes, (uint) value);
+					TidyLibrary.Document.SetOption(handle, TidyOptionId.TidySortAttributes, (uint) value);
 				}
 			}
 		}
@@ -651,72 +642,72 @@ namespace TidyManaged {
 		/// [tab-size] Gets or sets the number of columns that Tidy uses between successive tab stops. It is used to map tabs to spaces when reading the input. Tidy never outputs tabs. Defaults to 8.
 		/// </summary>
 		public int TabSize {
-			get { return (int) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyTabSize); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyTabSize, (uint) value); }
+			get { return (int) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyTabSize); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyTabSize, (uint) value); }
 		}
 
 		/// <summary>
 		/// [vertical-space] Gets or sets whether Tidy should add some empty lines for readability. Defaults to false.
 		/// </summary>
 		public bool AddVerticalSpace {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyVertSpace); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyVertSpace, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyVertSpace); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyVertSpace, value); }
 		}
 
 		/// <summary>
 		/// [wrap] Gets or sets the right margin Tidy uses for line wrapping. Tidy tries to wrap lines so that they do not exceed this length. Set wrap to zero if you want to disable line wrapping. Defaults to 68.
 		/// </summary>
 		public int WrapAt {
-			get { return (int) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyWrapLen); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyWrapLen, (uint) value); }
+			get { return (int) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyWrapLen); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapLen, (uint) value); }
 		}
 
 		/// <summary>
 		/// [wrap-asp] Gets or sets whether Tidy should line wrap text contained within ASP pseudo elements, which look like: &lt;% ... %&gt;. Defaults to true.
 		/// </summary>
 		public bool WrapAsp {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapAsp); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapAsp, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapAsp); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapAsp, value); }
 		}
 
 		/// <summary>
 		/// [wrap-attributes] Gets or sets whether Tidy should line wrap attribute values, for easier editing. This option can be set independently of WrapAcriptLiterals. Defaults to false.
 		/// </summary>
 		public bool WrapAttributeValues {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapAttVals); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapAttVals, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapAttVals); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapAttVals, value); }
 		}
 
 		/// <summary>
 		/// [wrap-jste] Gets or sets whether Tidy should line wrap text contained within JSTE  pseudo elements, which look like: &lt;# ... #&gt;. Defaults to true.
 		/// </summary>
 		public bool WrapJste {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapJste); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapJste, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapJste); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapJste, value); }
 		}
 
 		/// <summary>
 		/// [wrap-php] Gets or sets whether Tidy should line wrap text contained within PHP pseudo elements, which look like: &lt;?php ... ?&gt;. Defaults to true.
 		/// </summary>
 		public bool WrapPhp {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapPhp); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapPhp, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapPhp); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapPhp, value); }
 		}
 
 		/// <summary>
 		/// [wrap-script-literals] Gets or sets whether Tidy should line wrap string literals that appear in script attributes. Tidy wraps long script string literals by inserting a backslash character before the line break. Defaults to false.
 		/// </summary>
 		public bool WrapScriptLiterals {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapScriptlets); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapScriptlets, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapScriptlets); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapScriptlets, value); }
 		}
 
 		/// <summary>
 		/// [wrap-sections] Gets or sets whether Tidy should line wrap text contained within &lt;![ ... ]&gt; section tags. Defaults to true.
 		/// </summary>
 		public bool WrapSections {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWrapSection); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWrapSection, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWrapSection); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWrapSection, value); }
 		}
 
 		#endregion
@@ -727,32 +718,32 @@ namespace TidyManaged {
 		/// [ascii-chars] Gets or sets whether &amp;emdash;, &amp;rdquo;, and other named character entities are downgraded to their closest ascii equivalents when the "MakeClean" option is set to true. Defaults to false.
 		/// </summary>
 		public bool AsciiEntities {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyAsciiChars); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyAsciiChars, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyAsciiChars); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyAsciiChars, value); }
 		}
 
 		/// <summary>
 		/// [char-encoding] Gets or sets character encoding Tidy uses for both the input and output. For ascii, Tidy will accept Latin-1 (ISO-8859-1) character values, but will use entities for all characters whose value > 127. For raw, Tidy will output values above 127 without translating them into entities. For latin1, characters above 255 will be written as entities. For utf8, Tidy assumes that both input and output is encoded as UTF-8. You can use iso2022 for files encoded using the ISO-2022 family of encodings e.g. ISO-2022-JP. For mac and win1252, Tidy will accept vendor specific character values, but will use entities for all characters whose value > 127. For unsupported encodings, use an external utility to convert to and from UTF-8. Defaults to "Ascii".
 		/// </summary>
 		public EncodingType CharacterEncoding {
-			get { return (EncodingType) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyCharEncoding); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyCharEncoding, (uint) value); }
+			get { return (EncodingType) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyCharEncoding); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyCharEncoding, (uint) value); }
 		}
 
 		/// <summary>
 		/// [input-encoding] Gets or sets character encoding Tidy uses for the input. See CharacterEncoding for more info. Defaults to "Latin1".
 		/// </summary>
 		public EncodingType InputCharacterEncoding {
-			get { return (EncodingType) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyInCharEncoding); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyInCharEncoding, (uint) value); }
+			get { return (EncodingType) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyInCharEncoding); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyInCharEncoding, (uint) value); }
 		}
 
 		/// <summary>
 		/// [newline] Gets or sets the type of newline. The default is appropriate to the current platform: CRLF on PC-DOS, MS-Windows and OS/2, CR on Classic Mac OS, and LF everywhere else (Unix and Linux).
 		/// </summary>
 		public NewlineType NewLine {
-			get { return (NewlineType) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyNewline); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyNewline, (uint) value); }
+			get { return (NewlineType) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyNewline); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyNewline, (uint) value); }
 		}
 
 #if SUPPORT_UTF16_ENCODINGS
@@ -760,8 +751,8 @@ namespace TidyManaged {
 		/// [output-bom] Gets or sets whether Tidy should write a Unicode Byte Order Mark character (BOM; also known as Zero Width No-Break Space; has value of U+FEFF) to the beginning of the output; only for UTF-8 and UTF-16 output encodings. If set to "auto", this option causes Tidy to write a BOM to the output only if a BOM was present at the beginning of the input. A BOM is always written for XML/XHTML output using UTF-16 output encodings. Defaults to "Auto".
 		/// </summary>
 		public AutoBool OutputByteOrderMark {
-			get { return (AutoBool) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyOutputBOM); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyOutputBOM, (uint) value); }
+			get { return (AutoBool) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyOutputBOM); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyOutputBOM, (uint) value); }
 		}
 #endif
 
@@ -769,8 +760,8 @@ namespace TidyManaged {
 		/// [output-encoding] Gets or sets character encoding Tidy uses for the output. See CharacterEncoding for more info. May only be different from input-encoding for Latin encodings (ascii, latin0, latin1, mac, win1252, ibm858). Defaults to "Ascii".
 		/// </summary>
 		public EncodingType OutputCharacterEncoding {
-			get { return (EncodingType) TidyLibrary.Native.tidyOptGetInt(handle, TidyOptionId.TidyOutCharEncoding); }
-			set { TidyLibrary.Native.tidyOptSetInt(handle, TidyOptionId.TidyOutCharEncoding, (uint) value); }
+			get { return (EncodingType) TidyLibrary.Document.GetOption<int>(handle, TidyOptionId.TidyOutCharEncoding); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyOutCharEncoding, (uint) value); }
 		}
 
 		#endregion
@@ -781,64 +772,64 @@ namespace TidyManaged {
 		/// [error-file] Gets or sets the error file Tidy uses for errors and warnings. Normally errors and warnings are output to "stderr". Defaults to null.
 		/// </summary>
 		public string ErrorFile {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyErrFile); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyErrFile, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyErrFile); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyErrFile, value); }
 		}
 
 		/// <summary>
 		/// [force-output] Gets or sets whether Tidy should produce output even if errors are encountered. Use this option with care - if Tidy reports an error, this means Tidy was not able to, or is not sure how to, fix the error, so the resulting output may not reflect your intention. Defaults to false.
 		/// </summary>
 		public bool ForceOutput {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyForceOutput); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyForceOutput, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyForceOutput); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyForceOutput, value); }
 		}
 
 		/// <summary>
 		/// [gnu-emacs] Gets or sets whether Tidy should change the format for reporting errors and warnings to a format that is more easily parsed by GNU Emacs. Defaults to false.
 		/// </summary>
 		public bool UseGnuEmacsErrorFormat {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyEmacs); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyEmacs, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyEmacs); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyEmacs, value); }
 		}
 
 		/// <summary>
 		/// [keep-time] Gets or sets whether Tidy should keep the original modification time of files that Tidy modifies in place. The default is no. Setting the option to yes allows you to tidy files without causing these files to be uploaded to a web server when using a tool such as SiteCopy. Note this feature is not supported on some platforms. Defaults to false.
 		/// </summary>
 		public bool KeepModificationTimestamp {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyKeepFileTimes); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyKeepFileTimes, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyKeepFileTimes); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyKeepFileTimes, value); }
 		}
 
 		/// <summary>
 		/// [output-file] Gets or sets the output file Tidy uses for markup. Normally markup is written to "stdout". Defaults to null.
 		/// </summary>
 		public string OutputFile {
-			get { return TidyLibrary.Native.tidyOptGetValueString(handle, TidyOptionId.TidyOutFile); }
-			set { TidyLibrary.Native.tidyOptSetValue(handle, TidyOptionId.TidyOutFile, value); }
+			get { return TidyLibrary.Document.GetOption<string>(handle, TidyOptionId.TidyOutFile); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyOutFile, value); }
 		}
 
 		/// <summary>
 		/// [quiet] Gets or sets whether Tidy should output the summary of the numbers of errors and warnings, or the welcome or informational messages. Defaults to false.
 		/// </summary>
 		public bool Quiet {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyQuiet); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyQuiet, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyQuiet); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyQuiet, value); }
 		}
 
 		/// <summary>
 		/// [tidy-mark] Gets or sets whether Tidy should add a meta element to the document head to indicate that the document has been tidied. Tidy won't add a meta element if one is already present. Defaults to true.
 		/// </summary>
 		public bool AddTidyMetaElement {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyMark); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyMark, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyMark); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyMark, value); }
 		}
 
 		/// <summary>
 		/// [write-back] Gets or sets whether Tidy should write back the tidied markup to the same file it read from. You are advised to keep copies of important files before tidying them, as on rare occasions the result may not be what you expect. Defaults to false.
 		/// </summary>
 		public bool WriteBack {
-			get { return TidyLibrary.Native.tidyOptGetBool(handle, TidyOptionId.TidyWriteBack); }
-			set { TidyLibrary.Native.tidyOptSetBool(handle, TidyOptionId.TidyWriteBack, value); }
+			get { return TidyLibrary.Document.GetOption<bool>(handle, TidyOptionId.TidyWriteBack); }
+			set { TidyLibrary.Document.SetOption(handle, TidyOptionId.TidyWriteBack, value); }
 		}
 
 		#endregion
@@ -1006,7 +997,7 @@ namespace TidyManaged {
 					if (stream != null) {
 						stream.Dispose();
 					}
-					TidyLibrary.Native.tidyRelease(handle);
+					TidyLibrary.Document.Release(handle);
 				}
 				handle = IntPtr.Zero;
 				stream = null;

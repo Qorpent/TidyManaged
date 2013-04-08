@@ -29,6 +29,7 @@ using System;
 using System.IO;
 using NUnit.Framework;
 using TidyManaged;
+using TidyManaged.Interop;
 
 namespace TidyManagedTests {
 	[TestFixture(Description = "tests that environment is well formed")]
@@ -40,7 +41,7 @@ namespace TidyManagedTests {
 		[Test(Description = "interop working test")]
 		public void LibTidyAccessibleWithPinvoke()
 		{
-			Assert.AreNotEqual(0, TidyManaged.Interop.TidyLibrary.Native.tidyReleaseDate());
+			Assert.AreNotEqual(0, TidyLibrary.Native.tidyReleaseDate());
 		}
 
 		[Test]

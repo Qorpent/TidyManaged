@@ -74,6 +74,7 @@
     <Compile Include="Document.cs" />
     <Compile Include="EncodingType.cs" />
     <Compile Include="InputSource.cs" />
+    <Compile Include="Interop\TidyLibrary_NetStyle.cs" />
     <Compile Include="Interop\TidyLibrary.cs" />
     <Compile Include="Interop\TidyEOFFunc.cs" />
     <Compile Include="Interop\TidyGetByteFunc.cs" />
