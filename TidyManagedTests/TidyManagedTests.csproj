@@ -62,9 +62,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\dependency\win64\libtidy.dll">
+    <Content Include="..\..\repos\tidy-html5\build\msvc2010\x64\Debug\libtidy.dll">
       <Link>libtidy.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\repos\tidy-html5\build\msvc2010\x64\Debug\libtidy.pdb">
+      <Link>libtidy.pdb</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

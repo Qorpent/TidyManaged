@@ -32,10 +32,10 @@ namespace TidyManagedTests {
 			{
 				TidyLibrary.SetOption(dochandle,TidyOptionId.TidyAltText, "text");
 				Assert.AreEqual("text",TidyLibrary.GetOption<string>(dochandle,TidyOptionId.TidyAltText),"string");
-				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, true);
+				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, 1);
 				Assert.AreEqual(true, TidyLibrary.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool true");
-				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, false);
-				Assert.AreEqual(false, TidyLibrary.GetOption<bool>(dochandle, TidyOptionId.TidyBodyOnly), "bool false");
+				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyBodyOnly, 0);
+				Assert.AreEqual(false, TidyLibrary.GetOption<uint>(dochandle, TidyOptionId.TidyBodyOnly), "bool false");
 				Assert.AreEqual(TidyLibrary.Constants.DEFAULT_INDENT_SPACES, TidyLibrary.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");
 				TidyLibrary.SetOption(dochandle, TidyOptionId.TidyIndentSpaces, 16);
 				Assert.AreEqual(16, TidyLibrary.GetOption<int>(dochandle, TidyOptionId.TidyIndentSpaces), "int");

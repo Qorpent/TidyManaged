@@ -45,8 +45,8 @@ namespace TidyManagedTests {
 		}
 
 		[Test]
-		public void CanParseUtf8() {
-			var d = Document.FromString("ПРИВЕТ");
+		public void CanParseProblemsDetectedInEarlyVersion() {
+			var d = Document.FromString("<footer>ПРИВЕТ</footer>");
 			d.OutputBodyOnly = AutoBool.Yes;
 			d.CleanAndRepair();
 			var result = d.Save();
